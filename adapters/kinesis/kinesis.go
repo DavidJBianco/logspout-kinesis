@@ -104,6 +104,8 @@ func NewLogspoutAdapter(route *router.Route) (router.LogAdapter, error) {
 	}
 
 	// Host of the docker instance
+  docker_host := route.Options["docker_host"]
+
   if docker_host == "" {
     docker_host = getEnvVar("LK_DOCKER_HOST", "")
     if docker_host == "" {
@@ -113,7 +115,7 @@ func NewLogspoutAdapter(route *router.Route) (router.LogAdapter, error) {
       }
     }
   }
-	
+
 	// Whether to use the v0 logtstash layout or v1
     use_v0 := route.Options["use_v0_layout"] != ""
     if !use_v0 {
