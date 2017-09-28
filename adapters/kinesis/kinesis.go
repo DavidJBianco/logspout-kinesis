@@ -17,7 +17,7 @@
 /* Based on:
  * https://github.com/rtoma/logspout-redis-logstash/blob/master/redis.go
 */
- 
+
 package logspoutkinesis
 
 import (
@@ -88,14 +88,14 @@ func NewLogspoutAdapter(route *router.Route) (router.LogAdapter, error) {
     // The kinesis stream where the logs should be sent to
     streamName := route.Address
     fmt.Printf("# KINESIS Adapter - Using stream: %s\n", streamName)
-    
+
     // Create a route helper for easier route access
     route_helper := RouteHelper{route: route}
-    
+
     // Batch config
     batchproducer_config := getKinesisConfig(route_helper)
     fmt.Printf("# KINESIS Adapter - Batch config: %v\n", batchproducer_config)
-    
+
 	// Create a batchproducer
 	batch_producer, err := batchproducer.New(batch_client, streamName, batchproducer_config)
 	if err != nil {
@@ -104,10 +104,15 @@ func NewLogspoutAdapter(route *router.Route) (router.LogAdapter, error) {
 	}
 
 	// Host of the docker instance
-    docker_host := route.Options["docker_host"]
+  if docker_host == "" {
+    docker_host = getEnvVar("LK_DOCKER_HOST", "")
     if docker_host == "" {
-        docker_host = getEnvVar("LK_DOCKER_HOST", "unknown-docker-host")
+      docker_host, err = os.Hostname()
+      if err != nil {
+        docker_host = "unknown-docker-host"
+      }
     }
+  }
 	
 	// Whether to use the v0 logtstash layout or v1
     use_v0 := route.Options["use_v0_layout"] != ""
@@ -230,11 +235,11 @@ func (ka *KinesisAdapter) Stream(logstream chan *router.Message) {
             }
             continue
         }
- 		
+
 		// Unmute
         mute = false
 	}
-}	
+}
 
 func splitImage(image string) (string, string, string) {
     var tag string
