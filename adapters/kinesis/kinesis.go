@@ -116,7 +116,7 @@ func NewLogspoutAdapter(route *router.Route) (router.LogAdapter, error) {
     }
   }
 
-  fmt.Printf("# KINESIS Adapter - Docker Host: s\n", docker_host)
+  fmt.Printf("# KINESIS Adapter - Docker Host: %s\n", docker_host)
 
 	// Whether to use the v0 logtstash layout or v1
     use_v0 := route.Options["use_v0_layout"] != ""
